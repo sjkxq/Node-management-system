@@ -25,7 +25,5 @@
     "vue",
     "node-management",
     "visualization"
-  ],
-  "author": "Developer",
-  "license": "MIT"
+  ]
 }
