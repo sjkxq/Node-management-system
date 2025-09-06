@@ -244,9 +244,21 @@ export default {
       const data = nodeStore.exportData()
       const blob = new Blob([data], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
+      
+      // 创建包含时间戳的文件名
+      const now = new Date()
+      const timestamp = now.getFullYear() + 
+        String(now.getMonth() + 1).padStart(2, '0') + 
+        String(now.getDate()).padStart(2, '0') + '-' +
+        String(now.getHours()).padStart(2, '0') + 
+        String(now.getMinutes()).padStart(2, '0') + 
+        String(now.getSeconds()).padStart(2, '0')
+      
+      const filename = `node-management-data-${timestamp}.json`
+      
       const a = document.createElement('a')
       a.href = url
-      a.download = 'knowledge-graph-data.json'
+      a.download = filename
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
