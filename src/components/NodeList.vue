@@ -82,16 +82,33 @@
 <script>
 import { ref, computed } from 'vue'
 import { useNodeStore } from '../stores/nodes'
+import { useTypeStore } from '../stores/types'
 
 export default {
   name: 'NodeList',
   emits: ['node-selected'],
   setup(props, { emit }) {
     const nodeStore = useNodeStore()
+    const typeStore = useTypeStore()
     const searchTerm = ref('')
     const selectedNode = ref(null)
 
     const filteredNodes = computed(() => {
+      // 使用存储中的过滤后节点
+      if (nodeStore.filteredNodes.length > 0) {
+        if (!searchTerm.value) {
+          return nodeStore.filteredNodes
+        }
+        
+        // 如果同时有全局过滤和本地搜索，合并两者
+        const term = searchTerm.value.toLowerCase()
+        return nodeStore.filteredNodes.filter(node => 
+          node.name.toLowerCase().includes(term) ||
+          node.type.toLowerCase().includes(term)
+        )
+      }
+      
+      // 只使用本地搜索
       if (!searchTerm.value) {
         return nodeStore.nodes
       }

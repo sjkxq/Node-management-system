@@ -123,16 +123,18 @@ export default {
       network.on('doubleClick', handleDoubleClick)
       network.on('stabilizationIterationsDone', handleStabilization)
       
-      // 监听节点、边和类型的变化
-      watch(() => nodeStore.nodes, updateNodes, { deep: true })
-      watch(() => nodeStore.links, updateEdges, { deep: true })
+      // 监听过滤后的节点、边和类型的变化
+      watch(() => nodeStore.filteredNodes, updateNodes, { deep: true })
+      watch(() => nodeStore.filteredLinks, updateEdges, { deep: true })
+      watch(() => nodeStore.nodeTags, updateNodes, { deep: true })
+      watch(() => nodeStore.tags, updateNodes, { deep: true })
       watch(() => typeStore.nodeTypes, updateNodes, { deep: true })
       watch(() => typeStore.linkTypes, updateEdges, { deep: true })
     }
     
     // 获取Vis.js节点数据
     const getVisNodes = () => {
-      return nodeStore.nodes.map(node => {
+      return nodeStore.filteredNodes.map(node => {
         const nodeType = typeStore.getNodeTypeById(node.type) || 
           typeStore.nodeTypes.find(t => t.id === 'person') || 
           { color: '#cbd5e1', shape: 'circle' }
@@ -162,7 +164,7 @@ export default {
     
     // 获取Vis.js边数据
     const getVisEdges = () => {
-      return nodeStore.links.map(link => {
+      return nodeStore.filteredLinks.map(link => {
         const linkType = typeStore.getLinkTypeById(link.type) || { name: link.type, color: '#94a3b8' }
         
         return {
@@ -302,7 +304,7 @@ export default {
       const connectedNodes = new Set([nodeId])
       const connectedEdges = []
       
-      nodeStore.links.forEach(link => {
+      nodeStore.filteredLinks.forEach(link => {
         if (link.source === nodeId || link.target === nodeId) {
           connectedNodes.add(link.source)
           connectedNodes.add(link.target)

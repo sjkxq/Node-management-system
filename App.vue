@@ -7,7 +7,7 @@
           <button 
             @click="openNodeModal" 
             class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center"
-            v-if="!showTagManager && !showHierarchyManager"
+            v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-plus mr-2"></i>
             添加节点
@@ -15,7 +15,7 @@
           <button 
             @click="openLinkModal"
             class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md flex items-center"
-            v-if="!showTagManager && !showHierarchyManager"
+            v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-link mr-2"></i>
             添加关系
@@ -23,7 +23,7 @@
           <button 
             @click="openTypeManager"
             class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center"
-            v-if="!showTagManager && !showHierarchyManager"
+            v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-cog mr-2"></i>
             类型管理
@@ -31,7 +31,7 @@
           <button 
             @click="openTagManager"
             class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md flex items-center"
-            v-if="!showTagManager && !showHierarchyManager"
+            v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-tags mr-2"></i>
             标签管理
@@ -39,7 +39,7 @@
           <button 
             @click="openHierarchyManager"
             class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-md flex items-center"
-            v-if="!showTagManager && !showHierarchyManager"
+            v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-sitemap mr-2"></i>
             层次结构
@@ -53,7 +53,7 @@
       <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showTypeManager && !showTagManager && !showHierarchyManager">
         <div class="p-4 border-b border-gray-300">
           <h2 class="text-lg font-semibold mb-2">节点列表</h2>
-          <NodeList />
+          <NodeList @node-selected="handleNodeSelected" />
         </div>
         
         <div class="p-4 flex-1">
@@ -77,6 +77,12 @@
 
       <!-- 主内容区 -->
       <main class="flex-1 flex flex-col">
+        <!-- 搜索和过滤组件 -->
+        <SearchFilter 
+          v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
+          @filter-change="handleFilterChange"
+        />
+        
         <NetworkGraph 
           ref="networkGraph" 
           class="flex-1" 
@@ -113,6 +119,7 @@ import LinkModal from './src/components/LinkModal.vue'
 import TypeManager from './src/components/TypeManager.vue'
 import TagManager from './src/components/TagManager.vue'
 import HierarchyManager from './src/components/HierarchyManager.vue'
+import SearchFilter from './src/components/SearchFilter.vue'
 import { useNodeStore } from './src/stores/nodes'
 
 export default {
@@ -124,7 +131,8 @@ export default {
     LinkModal,
     TypeManager,
     TagManager,
-    HierarchyManager
+    HierarchyManager,
+    SearchFilter
   },
   setup() {
     const networkGraph = ref(null)
@@ -175,6 +183,13 @@ export default {
       }
     }
     
+    const handleFilterChange = () => {
+      // 当过滤条件改变时，重置高亮显示
+      if (networkGraph.value) {
+        networkGraph.value.resetHighlight()
+      }
+    }
+    
     const openTypeManager = () => {
       showTypeManager.value = true
     }
@@ -210,12 +225,14 @@ export default {
       showTypeManager,
       showTagManager,
       showHierarchyManager,
+      selectedNode,
       openNodeModal,
       openLinkModal,
       resetView,
       toggleFullScreen,
       handleNodeSelected,
       handleLinkSelected,
+      handleFilterChange,
       openTypeManager,
       closeTypeManager,
       openTagManager,

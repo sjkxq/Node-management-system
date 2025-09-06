@@ -115,6 +115,12 @@ export const useNodeStore = defineStore('nodes', () => {
     { parentId: '5', childId: '4' }  // 开发部 -> 王五
   ])
 
+  // 搜索和过滤状态
+  const searchQuery = ref('')
+  const selectedNodeType = ref('')
+  const selectedLinkType = ref('')
+  const selectedTag = ref('')
+
   // 模态框状态
   const isNodeModalOpen = ref(false)
   const isLinkModalOpen = ref(false)
@@ -277,6 +283,80 @@ export const useNodeStore = defineStore('nodes', () => {
     )
   }
 
+  // 搜索和过滤方法
+  const setSearchQuery = (query) => {
+    searchQuery.value = query
+  }
+
+  const setSelectedNodeType = (type) => {
+    selectedNodeType.value = type
+  }
+
+  const setSelectedLinkType = (type) => {
+    selectedLinkType.value = type
+  }
+
+  const setSelectedTag = (tagId) => {
+    selectedTag.value = tagId
+  }
+
+  const clearFilters = () => {
+    searchQuery.value = ''
+    selectedNodeType.value = ''
+    selectedLinkType.value = ''
+    selectedTag.value = ''
+  }
+
+  // 计算属性：过滤后的节点
+  const filteredNodes = computed(() => {
+    let result = nodes.value
+    
+    // 按搜索查询过滤
+    if (searchQuery.value) {
+      const query = searchQuery.value.toLowerCase()
+      result = result.filter(node => 
+        node.name.toLowerCase().includes(query) ||
+        (node.description && node.description.toLowerCase().includes(query)) ||
+        (node.position && node.position.toLowerCase().includes(query)) ||
+        (node.contact && node.contact.toLowerCase().includes(query))
+      )
+    }
+    
+    // 按节点类型过滤
+    if (selectedNodeType.value) {
+      result = result.filter(node => node.type === selectedNodeType.value)
+    }
+    
+    // 按标签过滤
+    if (selectedTag.value) {
+      result = result.filter(node => 
+        nodeTags.value.some(nt => 
+          nt.nodeId === node.id && nt.tagId === selectedTag.value
+        )
+      )
+    }
+    
+    return result
+  })
+
+  // 计算属性：过滤后的关系
+  const filteredLinks = computed(() => {
+    let result = links.value
+    
+    // 按关系类型过滤
+    if (selectedLinkType.value) {
+      result = result.filter(link => link.type === selectedLinkType.value)
+    }
+    
+    // 只显示与过滤后节点相关的关系
+    const filteredNodeIds = new Set(filteredNodes.value.map(node => node.id))
+    result = result.filter(link => 
+      filteredNodeIds.has(link.source) && filteredNodeIds.has(link.target)
+    )
+    
+    return result
+  })
+
   // 模态框操作方法
   const openNodeModal = (node = null) => {
     editingNode.value = node
@@ -305,6 +385,10 @@ export const useNodeStore = defineStore('nodes', () => {
     tags,
     nodeTags,
     hierarchies,
+    searchQuery,
+    selectedNodeType,
+    selectedLinkType,
+    selectedTag,
     isNodeModalOpen,
     isLinkModalOpen,
     editingNode,
@@ -337,6 +421,15 @@ export const useNodeStore = defineStore('nodes', () => {
     removeHierarchy,
     getChildrenForNode,
     getParentForNode,
+
+    // 搜索和过滤方法
+    setSearchQuery,
+    setSelectedNodeType,
+    setSelectedLinkType,
+    setSelectedTag,
+    clearFilters,
+    filteredNodes,
+    filteredLinks,
 
     // 模态框方法
     openNodeModal,
