@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useNodeStore } from '../stores/nodes'
 import { useTypeStore } from '../stores/types'
 import { DataSet, Network } from 'vis-network/standalone/esm/vis-network.min.js'
@@ -46,8 +46,11 @@ export default {
     const nodeStore = useNodeStore()
     const typeStore = useTypeStore()
     let network = null
+    // 保存原始节点和边数据，用于重置高亮
+    let originalNodes = []
+    let originalEdges = []
     
-    // 初始化图谱
+    // 初始化网络图
     const initGraph = () => {
       if (!graphElement.value) return
       
@@ -56,6 +59,10 @@ export default {
       
       // 创建边数据集
       const edges = new DataSet(getVisEdges())
+      
+      // 初始化完成后保存原始数据
+      originalNodes = getVisNodes()
+      originalEdges = getVisEdges()
       
       // 网络数据
       const data = {
@@ -185,14 +192,20 @@ export default {
     const updateNodes = () => {
       if (!network) return
       network.body.data.nodes.clear()
-      network.body.data.nodes.add(getVisNodes())
+      const nodes = getVisNodes()
+      network.body.data.nodes.add(nodes)
+      // 更新原始节点数据
+      originalNodes = [...nodes]
     }
     
     // 更新边
     const updateEdges = () => {
       if (!network) return
       network.body.data.edges.clear()
-      network.body.data.edges.add(getVisEdges())
+      const edges = getVisEdges()
+      network.body.data.edges.add(edges)
+      // 更新原始边数据
+      originalEdges = [...edges]
     }
     
     // 获取节点大小
@@ -229,7 +242,7 @@ export default {
       return tooltip
     }
     
-    // 加深颜色
+    // 颜色处理函数
     const darkenColor = (color, percent) => {
       let R = parseInt(color.substring(1, 3), 16)
       let G = parseInt(color.substring(3, 5), 16)
@@ -242,6 +255,26 @@ export default {
       R = (R < 255) ? R : 255
       G = (G < 255) ? G : 255
       B = (B < 255) ? B : 255
+      
+      const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16))
+      const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16))
+      const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16))
+      
+      return "#" + RR + GG + BB
+    }
+
+    const lightenColor = (color, percent) => {
+      let R = parseInt(color.substring(1, 3), 16)
+      let G = parseInt(color.substring(3, 5), 16)
+      let B = parseInt(color.substring(5, 7), 16)
+      
+      R = Math.floor(R * (100 + percent) / 100)
+      G = Math.floor(G * (100 + percent) / 100)
+      B = Math.floor(B * (100 + percent) / 100)
+      
+      R = (R > 255) ? 255 : R
+      G = (G > 255) ? 255 : G
+      B = (B > 255) ? 255 : B
       
       const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16))
       const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16))
@@ -299,11 +332,11 @@ export default {
     // 高亮显示节点及其关系
     const highlightNode = (nodeId) => {
       if (!network) return
-      
+
       // 获取与该节点相关的所有节点和边
       const connectedNodes = new Set([nodeId])
       const connectedEdges = []
-      
+
       nodeStore.filteredLinks.forEach(link => {
         if (link.source === nodeId || link.target === nodeId) {
           connectedNodes.add(link.source)
@@ -311,57 +344,63 @@ export default {
           connectedEdges.push(link.id)
         }
       })
-      
-      // 更新节点颜色
-      const allNodes = network.body.data.nodes.get()
-      allNodes.forEach(node => {
+
+      // 基于原始节点数据创建更新数据
+      const updatedNodes = originalNodes.map(node => {
         if (connectedNodes.has(node.id)) {
-          node.color = {
-            ...node.color,
-            border: '#f472b6'
+          return {
+            ...node,
+            color: {
+              ...node.color,
+              border: '#f472b6'
+            }
           }
         } else {
           // 淡化未连接节点
-          node.color = {
-            ...node.color,
-            opacity: 0.5
+          return {
+            ...node,
+            color: {
+              ...node.color,
+              opacity: 0.5
+            }
           }
         }
       })
-      
-      // 更新边颜色
-      const allEdges = network.body.data.edges.get()
-      allEdges.forEach(edge => {
+
+      // 基于原始边数据创建更新数据
+      const updatedEdges = originalEdges.map(edge => {
         if (connectedEdges.includes(edge.id)) {
-          edge.color = {
-            ...edge.color,
-            color: '#f472b6',
-            highlight: '#f472b6'
+          return {
+            ...edge,
+            color: {
+              ...edge.color,
+              color: '#f472b6',
+              highlight: '#f472b6'
+            }
           }
         } else {
           // 淡化未连接边
-          edge.color = {
-            ...edge.color,
-            opacity: 0.3
+          return {
+            ...edge,
+            color: {
+              ...edge.color,
+              opacity: 0.3
+            }
           }
         }
       })
-      
+
       // 更新网络数据
-      network.body.data.nodes.update(allNodes)
-      network.body.data.edges.update(allEdges)
+      network.body.data.nodes.update(updatedNodes)
+      network.body.data.edges.update(updatedEdges)
     }
-    
+
     // 重置高亮显示
     const resetHighlight = () => {
       if (!network) return
-      
+
       // 恢复所有节点和边的原始颜色
-      const allNodes = network.body.data.nodes.get()
-      const originalNodes = getVisNodes()
       network.body.data.nodes.update(originalNodes)
-      
-      const originalEdges = getVisEdges()
       network.body.data.edges.update(originalEdges)
     }
     
@@ -401,10 +440,11 @@ export default {
       })
     })
     
-    // 组件卸载时清理
-    onUnmounted(() => {
+    // 组件卸载前清理
+    onBeforeUnmount(() => {
       if (network) {
         network.destroy()
+        network = null
       }
     })
     
