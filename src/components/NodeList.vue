@@ -151,7 +151,7 @@ export default {
 
     const getNodeTypeName = (type) => {
       const typeNames = {
-        person: '联系人',
+        person: '节点',
         company: '公司',
         organization: '组织',
         tag: '标签'

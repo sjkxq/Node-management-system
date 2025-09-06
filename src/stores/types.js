@@ -6,8 +6,8 @@ export const useTypeStore = defineStore('types', () => {
   const nodeTypes = ref([
     { 
       id: 'person', 
-      name: '联系人', 
-      description: '个人联系人',
+      name: '节点', 
+      description: '基本节点',
       color: '#60a5fa',
       shape: 'circle'
     },

@@ -2,7 +2,7 @@
   <div id="app" class="flex flex-col h-screen">
     <header class="bg-blue-600 text-white p-4 shadow-md">
       <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold">联系人知识图谱管理系统</h1>
+        <h1 class="text-2xl font-bold">节点管理系统</h1>
         <div class="flex space-x-2">
           <button 
             @click="openNodeModal" 

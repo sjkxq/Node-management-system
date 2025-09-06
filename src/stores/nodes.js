@@ -6,11 +6,11 @@ export const useNodeStore = defineStore('nodes', () => {
   const nodes = ref([
     { 
       id: '1', 
-      name: '张三', 
+      name: '节点A', 
       type: 'person',
-      description: '项目经理',
-      position: '项目经理',
-      contact: 'zhangsan@example.com'
+      description: '示例节点',
+      position: '示例属性',
+      contact: 'node-a@example.com'
     },
     { 
       id: '2', 
@@ -20,19 +20,19 @@ export const useNodeStore = defineStore('nodes', () => {
     },
     { 
       id: '3', 
-      name: '李四', 
+      name: '节点B', 
       type: 'person',
-      description: '前端开发工程师',
-      position: '前端开发工程师',
-      contact: 'lisi@example.com'
+      description: '示例节点',
+      position: '示例属性',
+      contact: 'node-b@example.com'
     },
     { 
       id: '4', 
-      name: '王五', 
+      name: '节点C', 
       type: 'person',
-      description: '后端开发工程师',
-      position: '后端开发工程师',
-      contact: 'wangwu@example.com'
+      description: '示例节点',
+      position: '示例属性',
+      contact: 'node-c@example.com'
     },
     { 
       id: '5', 
@@ -49,28 +49,28 @@ export const useNodeStore = defineStore('nodes', () => {
       source: '1', 
       target: '2', 
       type: 'employment',
-      description: '张三在ABC公司工作'
+      description: '节点A与ABC公司有雇佣关系'
     },
     { 
       id: '2', 
       source: '3', 
       target: '2', 
       type: 'employment',
-      description: '李四在ABC公司工作'
+      description: '节点B与ABC公司有雇佣关系'
     },
     { 
       id: '3', 
       source: '4', 
       target: '2', 
       type: 'employment',
-      description: '王五在ABC公司工作'
+      description: '节点C与ABC公司有雇佣关系'
     },
     { 
       id: '4', 
       source: '1', 
       target: '3', 
       type: 'partnership',
-      description: '张三和李四是合作伙伴'
+      description: '节点A和节点B是合作伙伴'
     },
     { 
       id: '5', 
@@ -84,20 +84,20 @@ export const useNodeStore = defineStore('nodes', () => {
       source: '3', 
       target: '5', 
       type: 'membership',
-      description: '李四是开发部成员'
+      description: '节点B是开发部成员'
     },
     { 
       id: '7', 
       source: '4', 
       target: '5', 
       type: 'membership',
-      description: '王五是开发部成员'
+      description: '节点C是开发部成员'
     }
   ])
 
   // 标签数据
   const tags = ref([
-    { id: 'tag1', name: '重要联系人', color: '#ef4444' },
+    { id: 'tag1', name: '重要节点', color: '#ef4444' },
     { id: 'tag2', name: '客户', color: '#3b82f6' },
     { id: 'tag3', name: '供应商', color: '#10b981' }
   ])
@@ -111,8 +111,8 @@ export const useNodeStore = defineStore('nodes', () => {
   // 层次结构数据（父节点 -> 子节点）
   const hierarchies = ref([
     { parentId: '2', childId: '5' }, // ABC公司 -> 开发部
-    { parentId: '5', childId: '3' }, // 开发部 -> 李四
-    { parentId: '5', childId: '4' }  // 开发部 -> 王五
+    { parentId: '5', childId: '3' }, // 开发部 -> 节点B
+    { parentId: '5', childId: '4' }  // 开发部 -> 节点C
   ])
 
   // 搜索和过滤状态

@@ -1,7 +1,7 @@
 {
-  "name": "contact-knowledge-graph",
+  "name": "node-management-system",
   "version": "1.0.0",
-  "description": "联系人知识图谱管理系统",
+  "description": "节点管理系统",
   "main": "main.js",
   "type": "module",
   "scripts": {
@@ -23,8 +23,7 @@
   },
   "keywords": [
     "vue",
-    "knowledge-graph",
-    "contacts",
+    "node-management",
     "visualization"
   ],
   "author": "Developer",
