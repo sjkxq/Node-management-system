@@ -7,6 +7,7 @@
           <button 
             @click="openNodeModal" 
             class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center"
+            v-if="!showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-plus mr-2"></i>
             添加节点
@@ -14,6 +15,7 @@
           <button 
             @click="openLinkModal"
             class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md flex items-center"
+            v-if="!showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-link mr-2"></i>
             添加关系
@@ -21,10 +23,26 @@
           <button 
             @click="openTypeManager"
             class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center"
-            v-if="!showTypeManager"
+            v-if="!showTagManager && !showHierarchyManager"
           >
             <i class="fas fa-cog mr-2"></i>
             类型管理
+          </button>
+          <button 
+            @click="openTagManager"
+            class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md flex items-center"
+            v-if="!showTagManager && !showHierarchyManager"
+          >
+            <i class="fas fa-tags mr-2"></i>
+            标签管理
+          </button>
+          <button 
+            @click="openHierarchyManager"
+            class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-md flex items-center"
+            v-if="!showTagManager && !showHierarchyManager"
+          >
+            <i class="fas fa-sitemap mr-2"></i>
+            层次结构
           </button>
         </div>
       </div>
@@ -32,7 +50,7 @@
 
     <div class="flex flex-1 overflow-hidden">
       <!-- 侧边栏 -->
-      <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showTypeManager">
+      <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showTypeManager && !showTagManager && !showHierarchyManager">
         <div class="p-4 border-b border-gray-300">
           <h2 class="text-lg font-semibold mb-2">节点列表</h2>
           <NodeList />
@@ -64,11 +82,17 @@
           class="flex-1" 
           @node-selected="handleNodeSelected"
           @link-selected="handleLinkSelected"
-          v-show="!showTypeManager"
+          v-show="!showTypeManager && !showTagManager && !showHierarchyManager"
         />
         
         <!-- 类型管理界面 -->
         <TypeManager v-if="showTypeManager" class="flex-1 overflow-auto" />
+        
+        <!-- 标签管理界面 -->
+        <TagManager v-if="showTagManager" class="flex-1 overflow-auto" />
+        
+        <!-- 层次结构管理界面 -->
+        <HierarchyManager v-if="showHierarchyManager" class="flex-1 overflow-auto" />
       </main>
     </div>
 
@@ -87,6 +111,8 @@ import NodeList from './src/components/NodeList.vue'
 import NodeModal from './src/components/NodeModal.vue'
 import LinkModal from './src/components/LinkModal.vue'
 import TypeManager from './src/components/TypeManager.vue'
+import TagManager from './src/components/TagManager.vue'
+import HierarchyManager from './src/components/HierarchyManager.vue'
 import { useNodeStore } from './src/stores/nodes'
 
 export default {
@@ -96,7 +122,9 @@ export default {
     NodeList,
     NodeModal,
     LinkModal,
-    TypeManager
+    TypeManager,
+    TagManager,
+    HierarchyManager
   },
   setup() {
     const networkGraph = ref(null)
@@ -104,6 +132,8 @@ export default {
     const isFullScreen = ref(false)
     const selectedNode = ref(null)
     const showTypeManager = ref(false)
+    const showTagManager = ref(false)
+    const showHierarchyManager = ref(false)
 
     const openNodeModal = () => {
       nodeStore.openNodeModal()
@@ -153,13 +183,33 @@ export default {
       showTypeManager.value = false
     }
     
-    // 提供关闭类型管理界面的方法给子组件
+    const openTagManager = () => {
+      showTagManager.value = true
+    }
+    
+    const closeTagManager = () => {
+      showTagManager.value = false
+    }
+    
+    const openHierarchyManager = () => {
+      showHierarchyManager.value = true
+    }
+    
+    const closeHierarchyManager = () => {
+      showHierarchyManager.value = false
+    }
+    
+    // 提供关闭各种管理界面的方法给子组件
     provide('closeTypeManager', closeTypeManager)
+    provide('closeTagManager', closeTagManager)
+    provide('closeHierarchyManager', closeHierarchyManager)
 
     return {
       networkGraph,
       isFullScreen,
       showTypeManager,
+      showTagManager,
+      showHierarchyManager,
       openNodeModal,
       openLinkModal,
       resetView,
@@ -167,7 +217,11 @@ export default {
       handleNodeSelected,
       handleLinkSelected,
       openTypeManager,
-      closeTypeManager
+      closeTypeManager,
+      openTagManager,
+      closeTagManager,
+      openHierarchyManager,
+      closeHierarchyManager
     }
   }
 }

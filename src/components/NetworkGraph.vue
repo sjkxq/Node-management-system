@@ -137,15 +137,24 @@ export default {
           typeStore.nodeTypes.find(t => t.id === 'person') || 
           { color: '#cbd5e1', shape: 'circle' }
         
+        // 获取节点的标签
+        const nodeTags = nodeStore.getTagsForNode(node.id)
+        
+        // 构建标签显示文本
+        let tagText = ''
+        if (nodeTags.length > 0) {
+          tagText = '\n[' + nodeTags.map(tag => tag.name).join(', ') + ']'
+        }
+        
         return {
           id: node.id,
-          label: node.name,
+          label: node.name + tagText,
           color: {
             background: nodeType.color,
             border: darkenColor(nodeType.color, 20)
           },
           shape: nodeType.shape,
-          title: getNodeTooltip(node, nodeType),
+          title: getNodeTooltip(node, nodeType, nodeTags),
           size: getNodeSize(node)
         }
       })
@@ -192,7 +201,7 @@ export default {
     }
     
     // 获取节点提示信息
-    const getNodeTooltip = (node, nodeType) => {
+    const getNodeTooltip = (node, nodeType, nodeTags) => {
       let tooltip = `<b>${node.name}</b><br/>类型: ${nodeType.name}`
       
       if (node.description) {
@@ -205,6 +214,11 @@ export default {
       
       if (node.type === 'person' && node.contact) {
         tooltip += `<br/>联系方式: ${node.contact}`
+      }
+      
+      // 添加标签信息
+      if (nodeTags.length > 0) {
+        tooltip += `<br/>标签: ${nodeTags.map(tag => `<span style="color:${tag.color}">${tag.name}</span>`).join(', ')}`
       }
       
       const connections = nodeStore.getLinksForNode(node.id)
