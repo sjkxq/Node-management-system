@@ -35,6 +35,7 @@
 import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useNodeStore } from '../stores/nodes'
 import { useTypeStore } from '../stores/types'
+import { useHighlightStore } from '../stores/highlight'
 import { DataSet, Network } from 'vis-network/standalone/esm/vis-network.min.js'
 
 export default {
@@ -43,9 +44,11 @@ export default {
   setup(props, { emit }) {
     const graphContainer = ref(null)
     const graphElement = ref(null)
+    let network = null
     const nodeStore = useNodeStore()
     const typeStore = useTypeStore()
-    let network = null
+    const highlightStore = useHighlightStore()
+    
     // 保存原始节点和边数据，用于重置高亮
     let originalNodes = []
     let originalEdges = []
