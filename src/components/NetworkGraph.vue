@@ -268,6 +268,13 @@ export default {
         if (node) {
           nodeStore.openNodeModal(node)
         }
+      } else if (params.edges.length > 0) {
+        // 双击边
+        const edgeId = params.edges[0]
+        const edge = nodeStore.links.find(link => link.id === edgeId)
+        if (edge) {
+          nodeStore.openLinkModal(edge)
+        }
       }
     }
     
@@ -345,6 +352,11 @@ export default {
       network.body.data.edges.update(originalEdges)
     }
     
+    // 编辑关系
+    const editLink = (link) => {
+      nodeStore.openLinkModal(link)
+    }
+    
     // 缩放功能
     const zoomIn = () => {
       if (!network) return
@@ -390,7 +402,8 @@ export default {
       zoomOut,
       resetView,
       highlightNode,
-      resetHighlight
+      resetHighlight,
+      editLink
     }
   }
 }

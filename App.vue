@@ -123,7 +123,11 @@ export default {
     }
     
     const handleLinkSelected = (link) => {
-      // 可以在这里处理选中关系的逻辑
+      // 当选中关系时，可以在这里处理逻辑
+      // 例如，可以打开编辑模态框
+      if (link) {
+        nodeStore.openLinkModal(link)
+      }
     }
 
     return {

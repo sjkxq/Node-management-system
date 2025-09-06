@@ -25,17 +25,55 @@
         <div class="flex-1 min-w-0">
           <div class="font-medium truncate">{{ node.name }}</div>
           <div class="text-xs text-gray-500 truncate">{{ getNodeTypeName(node.type) }}</div>
+          <div class="text-xs text-gray-400 mt-1">
+            关系: {{ getLinksForNode(node.id).length }} 个
+          </div>
         </div>
-        <button
-          @click.stop="deleteNode(node)"
-          class="text-red-500 hover:text-red-700 ml-2"
-        >
-          <i class="fas fa-trash"></i>
-        </button>
+        <div class="flex flex-col space-y-1">
+          <button
+            @click.stop="editNode(node)"
+            class="text-blue-500 hover:text-blue-700"
+            title="编辑节点"
+          >
+            <i class="fas fa-edit"></i>
+          </button>
+          <button
+            @click.stop="deleteNode(node)"
+            class="text-red-500 hover:text-red-700"
+            title="删除节点"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
       </div>
       
       <div v-if="filteredNodes.length === 0" class="text-center py-4 text-gray-500">
         暂无节点数据
+      </div>
+    </div>
+    
+    <!-- 显示选中节点的关系 -->
+    <div v-if="selectedNode" class="mt-4 p-3 border border-gray-200 rounded-md bg-gray-50">
+      <h3 class="font-medium mb-2">节点关系</h3>
+      <div 
+        v-for="link in getLinksForNode(selectedNode.id)" 
+        :key="link.id"
+        class="flex justify-between items-center py-1 border-b border-gray-100"
+      >
+        <div class="text-sm">
+          <span>{{ getNodeNameById(link.source === selectedNode.id ? link.target : link.source) }}</span>
+          <span class="mx-2 text-gray-400">-</span>
+          <span class="text-gray-600">{{ getLinkTypeName(link.type) }}</span>
+        </div>
+        <button 
+          @click="editLink(link)"
+          class="text-blue-500 hover:text-blue-700 text-xs"
+        >
+          <i class="fas fa-edit"></i> 编辑
+        </button>
+      </div>
+      <div v-if="getLinksForNode(selectedNode.id).length === 0" class="text-sm text-gray-500">
+        暂无关系
       </div>
     </div>
   </div>
@@ -79,6 +117,10 @@ export default {
         nodeStore.deleteNode(node.id)
       }
     }
+    
+    const editLink = (link) => {
+      nodeStore.openLinkModal(link)
+    }
 
     const getNodeColorClass = (type) => {
       const colorClasses = {
@@ -99,6 +141,28 @@ export default {
       }
       return typeNames[type] || '未知类型'
     }
+    
+    const getLinkTypeName = (type) => {
+      const typeNames = {
+        connection: '连接',
+        employment: '雇佣',
+        membership: '成员',
+        partnership: '合作',
+        tagged: '标记'
+      }
+      return typeNames[type] || '未知关系'
+    }
+    
+    const getNodeNameById = (id) => {
+      const node = nodeStore.nodes.find(n => n.id === id)
+      return node ? node.name : '未知节点'
+    }
+    
+    const getLinksForNode = (nodeId) => {
+      return nodeStore.links.filter(link => 
+        link.source === nodeId || link.target === nodeId
+      )
+    }
 
     return {
       searchTerm,
@@ -107,8 +171,12 @@ export default {
       selectNode,
       editNode,
       deleteNode,
+      editLink,
       getNodeColorClass,
-      getNodeTypeName
+      getNodeTypeName,
+      getLinkTypeName,
+      getNodeNameById,
+      getLinksForNode
     }
   }
 }
