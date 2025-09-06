@@ -21,6 +21,27 @@
             添加关系
           </button>
           <button 
+            @click="exportData"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-md flex items-center"
+            v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
+          >
+            <i class="fas fa-file-export mr-2"></i>
+            导出数据
+          </button>
+          <label 
+            class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md flex items-center cursor-pointer"
+            v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
+          >
+            <i class="fas fa-file-import mr-2"></i>
+            导入数据
+            <input 
+              type="file" 
+              accept=".json" 
+              @change="importData" 
+              class="hidden"
+            />
+          </label>
+          <button 
             @click="openTypeManager"
             class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager"
@@ -219,6 +240,37 @@ export default {
     provide('closeTagManager', closeTagManager)
     provide('closeHierarchyManager', closeHierarchyManager)
 
+    const exportData = () => {
+      const data = nodeStore.exportData()
+      const blob = new Blob([data], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'knowledge-graph-data.json'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
+
+    const importData = (event) => {
+      const file = event.target.files[0]
+      if (!file) return
+
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = nodeStore.importData(e.target.result)
+        if (result.success) {
+          alert('数据导入成功！')
+        } else {
+          alert('数据导入失败：' + result.error)
+        }
+        // 清空input值，以便可以重复导入相同文件
+        event.target.value = ''
+      }
+      reader.readAsText(file)
+    }
+
     return {
       networkGraph,
       isFullScreen,
@@ -238,7 +290,9 @@ export default {
       openTagManager,
       closeTagManager,
       openHierarchyManager,
-      closeHierarchyManager
+      closeHierarchyManager,
+      exportData,
+      importData
     }
   }
 }

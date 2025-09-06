@@ -378,6 +378,41 @@ export const useNodeStore = defineStore('nodes', () => {
     editingLink.value = null
   }
 
+  // 导出所有数据
+  const exportData = () => {
+    const data = {
+      nodes: nodes.value,
+      links: links.value,
+      tags: tags.value,
+      nodeTags: nodeTags.value,
+      hierarchies: hierarchies.value
+    }
+    return JSON.stringify(data, null, 2)
+  }
+
+  // 导入数据
+  const importData = (jsonData) => {
+    try {
+      const data = JSON.parse(jsonData)
+      
+      // 验证数据结构
+      if (!data.nodes || !data.links || !data.tags || !data.nodeTags || !data.hierarchies) {
+        throw new Error('Invalid data format')
+      }
+      
+      // 更新所有数据
+      nodes.value = data.nodes
+      links.value = data.links
+      tags.value = data.tags
+      nodeTags.value = data.nodeTags
+      hierarchies.value = data.hierarchies
+      
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
   return {
     // 状态
     nodes,
@@ -435,6 +470,10 @@ export const useNodeStore = defineStore('nodes', () => {
     openNodeModal,
     closeNodeModal,
     openLinkModal,
-    closeLinkModal
+    closeLinkModal,
+
+    // 导入导出方法
+    exportData,
+    importData
   }
 })
