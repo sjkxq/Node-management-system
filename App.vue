@@ -18,13 +18,21 @@
             <i class="fas fa-link mr-2"></i>
             添加关系
           </button>
+          <button 
+            @click="openTypeManager"
+            class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center"
+            v-if="!showTypeManager"
+          >
+            <i class="fas fa-cog mr-2"></i>
+            类型管理
+          </button>
         </div>
       </div>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
       <!-- 侧边栏 -->
-      <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col">
+      <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showTypeManager">
         <div class="p-4 border-b border-gray-300">
           <h2 class="text-lg font-semibold mb-2">节点列表</h2>
           <NodeList />
@@ -56,7 +64,11 @@
           class="flex-1" 
           @node-selected="handleNodeSelected"
           @link-selected="handleLinkSelected"
+          v-show="!showTypeManager"
         />
+        
+        <!-- 类型管理界面 -->
+        <TypeManager v-if="showTypeManager" class="flex-1 overflow-auto" />
       </main>
     </div>
 
@@ -69,11 +81,12 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed, provide } from 'vue'
 import NetworkGraph from './src/components/NetworkGraph.vue'
 import NodeList from './src/components/NodeList.vue'
 import NodeModal from './src/components/NodeModal.vue'
 import LinkModal from './src/components/LinkModal.vue'
+import TypeManager from './src/components/TypeManager.vue'
 import { useNodeStore } from './src/stores/nodes'
 
 export default {
@@ -82,13 +95,15 @@ export default {
     NetworkGraph,
     NodeList,
     NodeModal,
-    LinkModal
+    LinkModal,
+    TypeManager
   },
   setup() {
     const networkGraph = ref(null)
     const nodeStore = useNodeStore()
     const isFullScreen = ref(false)
     const selectedNode = ref(null)
+    const showTypeManager = ref(false)
 
     const openNodeModal = () => {
       nodeStore.openNodeModal()
@@ -129,16 +144,30 @@ export default {
         nodeStore.openLinkModal(link)
       }
     }
+    
+    const openTypeManager = () => {
+      showTypeManager.value = true
+    }
+    
+    const closeTypeManager = () => {
+      showTypeManager.value = false
+    }
+    
+    // 提供关闭类型管理界面的方法给子组件
+    provide('closeTypeManager', closeTypeManager)
 
     return {
       networkGraph,
       isFullScreen,
+      showTypeManager,
       openNodeModal,
       openLinkModal,
       resetView,
       toggleFullScreen,
       handleNodeSelected,
-      handleLinkSelected
+      handleLinkSelected,
+      openTypeManager,
+      closeTypeManager
     }
   }
 }

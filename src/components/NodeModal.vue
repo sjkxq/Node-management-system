@@ -27,10 +27,13 @@
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="person">联系人</option>
-              <option value="company">公司</option>
-              <option value="organization">组织</option>
-              <option value="tag">标签</option>
+              <option 
+                v-for="nodeType in nodeTypes" 
+                :key="nodeType.id" 
+                :value="nodeType.id"
+              >
+                {{ nodeType.name }}
+              </option>
             </select>
           </div>
           
@@ -87,14 +90,17 @@
 <script>
 import { computed, reactive, watch } from 'vue'
 import { useNodeStore } from '../stores/nodes'
+import { useTypeStore } from '../stores/types'
 
 export default {
   name: 'NodeModal',
   setup() {
     const nodeStore = useNodeStore()
+    const typeStore = useTypeStore()
     
     const isVisible = computed(() => nodeStore.isNodeModalOpen)
     const editingNode = computed(() => nodeStore.editingNode)
+    const nodeTypes = computed(() => typeStore.nodeTypes)
     
     const form = reactive({
       name: '',
@@ -154,6 +160,7 @@ export default {
     return {
       isVisible,
       editingNode,
+      nodeTypes,
       form,
       closeModal,
       saveNode

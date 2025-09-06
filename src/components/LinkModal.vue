@@ -53,11 +53,13 @@
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="connection">连接</option>
-              <option value="employment">雇佣</option>
-              <option value="membership">成员</option>
-              <option value="partnership">合作</option>
-              <option value="tagged">标记</option>
+              <option 
+                v-for="linkType in linkTypes" 
+                :key="linkType.id" 
+                :value="linkType.id"
+              >
+                {{ linkType.name }}
+              </option>
             </select>
           </div>
           
@@ -94,15 +96,18 @@
 <script>
 import { computed, reactive, watch } from 'vue'
 import { useNodeStore } from '../stores/nodes'
+import { useTypeStore } from '../stores/types'
 
 export default {
   name: 'LinkModal',
   setup() {
     const nodeStore = useNodeStore()
+    const typeStore = useTypeStore()
     
     const isVisible = computed(() => nodeStore.isLinkModalOpen)
     const editingLink = computed(() => nodeStore.editingLink)
     const nodes = computed(() => nodeStore.nodes)
+    const linkTypes = computed(() => typeStore.linkTypes)
     
     const form = reactive({
       source: '',
@@ -170,6 +175,7 @@ export default {
       isVisible,
       editingLink,
       nodes,
+      linkTypes,
       form,
       closeModal,
       saveLink,

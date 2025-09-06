@@ -32,8 +32,9 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
 import { useNodeStore } from '../stores/nodes'
+import { useTypeStore } from '../stores/types'
 import { DataSet, Network } from 'vis-network/standalone/esm/vis-network.min.js'
 
 export default {
@@ -43,6 +44,7 @@ export default {
     const graphContainer = ref(null)
     const graphElement = ref(null)
     const nodeStore = useNodeStore()
+    const typeStore = useTypeStore()
     let network = null
     
     // 初始化图谱
@@ -78,10 +80,6 @@ export default {
           width: 2,
           smooth: {
             type: 'continuous'
-          },
-          color: {
-            color: '#94a3b8',
-            highlight: '#f472b6'
           },
           arrows: {
             to: {
@@ -125,27 +123,29 @@ export default {
       network.on('doubleClick', handleDoubleClick)
       network.on('stabilizationIterationsDone', handleStabilization)
       
-      // 监听节点和边的变化
+      // 监听节点、边和类型的变化
       watch(() => nodeStore.nodes, updateNodes, { deep: true })
       watch(() => nodeStore.links, updateEdges, { deep: true })
+      watch(() => typeStore.nodeTypes, updateNodes, { deep: true })
+      watch(() => typeStore.linkTypes, updateEdges, { deep: true })
     }
     
     // 获取Vis.js节点数据
     const getVisNodes = () => {
       return nodeStore.nodes.map(node => {
-        const colorMap = {
-          person: { background: '#60a5fa', border: '#3b82f6' },
-          company: { background: '#34d399', border: '#10b981' },
-          organization: { background: '#fbbf24', border: '#f59e0b' },
-          tag: { background: '#f472b6', border: '#ec4899' }
-        }
+        const nodeType = typeStore.getNodeTypeById(node.type) || 
+          typeStore.nodeTypes.find(t => t.id === 'person') || 
+          { color: '#cbd5e1', shape: 'circle' }
         
         return {
           id: node.id,
           label: node.name,
-          color: colorMap[node.type] || { background: '#cbd5e1', border: '#94a3b8' },
-          shape: getNodeShape(node.type),
-          title: getNodeTooltip(node),
+          color: {
+            background: nodeType.color,
+            border: darkenColor(nodeType.color, 20)
+          },
+          shape: nodeType.shape,
+          title: getNodeTooltip(node, nodeType),
           size: getNodeSize(node)
         }
       })
@@ -154,20 +154,18 @@ export default {
     // 获取Vis.js边数据
     const getVisEdges = () => {
       return nodeStore.links.map(link => {
-        const typeMap = {
-          connection: '连接',
-          employment: '雇佣',
-          membership: '成员',
-          partnership: '合作',
-          tagged: '标记'
-        }
+        const linkType = typeStore.getLinkTypeById(link.type) || { name: link.type, color: '#94a3b8' }
         
         return {
           id: link.id,
           from: link.source,
           to: link.target,
-          label: typeMap[link.type] || link.type,
-          title: link.description || typeMap[link.type] || link.type
+          label: linkType.name,
+          title: link.description || linkType.name,
+          color: {
+            color: linkType.color,
+            highlight: '#f472b6'
+          }
         }
       })
     }
@@ -186,17 +184,6 @@ export default {
       network.body.data.edges.add(getVisEdges())
     }
     
-    // 获取节点形状
-    const getNodeShape = (type) => {
-      const shapeMap = {
-        person: 'circle',
-        company: 'box',
-        organization: 'ellipse',
-        tag: 'diamond'
-      }
-      return shapeMap[type] || 'circle'
-    }
-    
     // 获取节点大小
     const getNodeSize = (node) => {
       // 根据连接数调整节点大小
@@ -205,8 +192,8 @@ export default {
     }
     
     // 获取节点提示信息
-    const getNodeTooltip = (node) => {
-      let tooltip = `<b>${node.name}</b><br/>类型: ${getNodeTypeName(node.type)}`
+    const getNodeTooltip = (node, nodeType) => {
+      let tooltip = `<b>${node.name}</b><br/>类型: ${nodeType.name}`
       
       if (node.description) {
         tooltip += `<br/>描述: ${node.description}`
@@ -226,15 +213,25 @@ export default {
       return tooltip
     }
     
-    // 获取节点类型名称
-    const getNodeTypeName = (type) => {
-      const typeNames = {
-        person: '联系人',
-        company: '公司',
-        organization: '组织',
-        tag: '标签'
-      }
-      return typeNames[type] || '未知类型'
+    // 加深颜色
+    const darkenColor = (color, percent) => {
+      let R = parseInt(color.substring(1, 3), 16)
+      let G = parseInt(color.substring(3, 5), 16)
+      let B = parseInt(color.substring(5, 7), 16)
+      
+      R = Math.floor(R * (100 - percent) / 100)
+      G = Math.floor(G * (100 - percent) / 100)
+      B = Math.floor(B * (100 - percent) / 100)
+      
+      R = (R < 255) ? R : 255
+      G = (G < 255) ? G : 255
+      B = (B < 255) ? B : 255
+      
+      const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16))
+      const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16))
+      const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16))
+      
+      return "#" + RR + GG + BB
     }
     
     // 处理点击事件
