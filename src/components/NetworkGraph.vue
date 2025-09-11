@@ -6,23 +6,23 @@
     >
     </div>
     
-    <div class="absolute top-4 right-4 bg-white rounded-lg shadow-md p-3">
-      <div class="flex space-x-2">
+    <div class="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white rounded-lg shadow-md p-2 sm:p-3">
+      <div class="flex space-x-1 sm:space-x-2">
         <button 
           @click="zoomIn" 
-          class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center"
+          class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center text-xs sm:text-base"
         >
           <i class="fas fa-plus"></i>
         </button>
         <button 
           @click="zoomOut" 
-          class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center"
+          class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center text-xs sm:text-base"
         >
           <i class="fas fa-minus"></i>
         </button>
         <button 
           @click="resetView" 
-          class="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center"
+          class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center text-xs sm:text-base"
         >
           <i class="fas fa-expand"></i>
         </button>

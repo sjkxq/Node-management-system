@@ -1,61 +1,61 @@
 <template>
   <div id="app" class="flex flex-col h-screen">
-    <header class="bg-blue-600 text-white p-4 shadow-md">
-      <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold">节点管理系统</h1>
-        <div class="flex space-x-2">
+    <header class="bg-blue-600 text-white p-2 sm:p-4 shadow-md">
+      <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+        <h1 class="text-xl sm:text-2xl font-bold">节点管理系统</h1>
+        <div class="flex flex-wrap justify-center gap-1 sm:gap-2">
           <button 
             @click="toggleTheme"
-            class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-md flex items-center"
+            class="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
             <i :class="[
               'fas',
               appliedTheme === 'dark' ? 'fa-sun' : 'fa-moon',
-              'mr-2'
+              'mr-1 sm:mr-2 text-xs sm:text-base'
             ]"></i>
-            {{ appliedTheme === 'dark' ? '日间模式' : '夜间模式' }}
+            <span>{{ appliedTheme === 'dark' ? '日间模式' : '夜间模式' }}</span>
           </button>
           
           <button 
             @click="openHighlightSettings"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md flex items-center"
+            class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-palette mr-2"></i>
-            高亮设置
+            <i class="fas fa-palette mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>高亮设置</span>
           </button>
           
           <button 
             @click="openNodeModal" 
-            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center"
+            class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-plus mr-2"></i>
-            添加节点
+            <i class="fas fa-plus mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>添加节点</span>
           </button>
           <button 
             @click="openLinkModal"
-            class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md flex items-center"
+            class="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-link mr-2"></i>
-            添加关系
+            <i class="fas fa-link mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>添加关系</span>
           </button>
           <button 
             @click="exportData"
-            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-md flex items-center"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-file-export mr-2"></i>
-            导出数据
+            <i class="fas fa-file-export mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>导出数据</span>
           </button>
           <label 
-            class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md flex items-center cursor-pointer"
+            class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center cursor-pointer text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-file-import mr-2"></i>
-            导入数据
+            <i class="fas fa-file-import mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>导入数据</span>
             <input 
               type="file" 
               accept=".json" 
@@ -65,27 +65,27 @@
           </label>
           <button 
             @click="openTypeManager"
-            class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center"
+            class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-cog mr-2"></i>
-            类型管理
+            <i class="fas fa-cog mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>类型管理</span>
           </button>
           <button 
             @click="openTagManager"
-            class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md flex items-center"
+            class="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-tags mr-2"></i>
-            标签管理
+            <i class="fas fa-tags mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>标签管理</span>
           </button>
           <button 
             @click="openHierarchyManager"
-            class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-md flex items-center"
+            class="bg-teal-500 hover:bg-teal-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
           >
-            <i class="fas fa-sitemap mr-2"></i>
-            层次结构
+            <i class="fas fa-sitemap mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>层次结构</span>
           </button>
         </div>
       </div>
@@ -93,24 +93,24 @@
 
     <div class="flex flex-1 overflow-hidden">
       <!-- 侧边栏 -->
-      <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings">
-        <div class="p-4 border-b border-gray-300">
-          <h2 class="text-lg font-semibold mb-2">节点列表</h2>
+      <aside class="hidden md:block w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings">
+        <div class="p-3 sm:p-4 border-b border-gray-300">
+          <h2 class="text-base sm:text-lg font-semibold mb-2">节点列表</h2>
           <NodeList @node-selected="handleNodeSelected" />
         </div>
         
-        <div class="p-4 flex-1">
-          <h2 class="text-lg font-semibold mb-2">操作面板</h2>
+        <div class="p-3 sm:p-4 flex-1">
+          <h2 class="text-base sm:text-lg font-semibold mb-2">操作面板</h2>
           <div class="space-y-2">
             <button 
               @click="resetView" 
-              class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+              class="w-full bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base"
             >
               重置视图
             </button>
             <button 
               @click="toggleFullScreen" 
-              class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-md"
+              class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-2 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base"
             >
               {{ isFullScreen ? '退出全屏' : '全屏显示' }}
             </button>

@@ -1,45 +1,45 @@
 <template>
   <div class="node-list">
-    <div class="mb-3">
+    <div class="mb-2 sm:mb-3">
       <input
         v-model="searchTerm"
         type="text"
         placeholder="搜索节点..."
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="w-full px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </div>
     
-    <div class="space-y-2 max-h-96 overflow-y-auto">
+    <div class="space-y-1 sm:space-y-2 max-h-64 sm:max-h-96 overflow-y-auto">
       <div
         v-for="node in filteredNodes"
         :key="node.id"
         @click="selectNode(node)"
         @dblclick="editNode(node)"
-        class="p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors flex items-center"
+        class="p-2 sm:p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors flex items-center"
         :class="{ 'bg-blue-50 border-blue-300': selectedNode?.id === node.id }"
       >
         <div
-          class="w-3 h-3 rounded-full mr-2"
+          class="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2"
           :class="getNodeColorClass(node.type)"
         ></div>
         <div class="flex-1 min-w-0">
-          <div class="font-medium truncate">{{ node.name }}</div>
+          <div class="font-medium text-sm sm:text-base truncate">{{ node.name }}</div>
           <div class="text-xs text-gray-500 truncate">{{ getNodeTypeName(node.type) }}</div>
           <div class="text-xs text-gray-400 mt-1">
             关系: {{ getLinksForNode(node.id).length }} 个
           </div>
         </div>
-        <div class="flex flex-col space-y-1">
+        <div class="flex flex-col space-y-0.5 sm:space-y-1">
           <button
             @click.stop="editNode(node)"
-            class="text-blue-500 hover:text-blue-700"
+            class="text-blue-500 hover:text-blue-700 text-xs sm:text-sm"
             title="编辑节点"
           >
             <i class="fas fa-edit"></i>
           </button>
           <button
             @click.stop="deleteNode(node)"
-            class="text-red-500 hover:text-red-700"
+            class="text-red-500 hover:text-red-700 text-xs sm:text-sm"
             title="删除节点"
           >
             <i class="fas fa-trash"></i>
@@ -47,22 +47,22 @@
         </div>
       </div>
       
-      <div v-if="filteredNodes.length === 0" class="text-center py-4 text-gray-500">
+      <div v-if="filteredNodes.length === 0" class="text-center py-3 sm:py-4 text-gray-500 text-sm sm:text-base">
         暂无节点数据
       </div>
     </div>
     
     <!-- 显示选中节点的关系 -->
-    <div v-if="selectedNode" class="mt-4 p-3 border border-gray-200 rounded-md bg-gray-50">
-      <h3 class="font-medium mb-2">节点关系</h3>
+    <div v-if="selectedNode" class="mt-3 sm:mt-4 p-2 sm:p-3 border border-gray-200 rounded-md bg-gray-50">
+      <h3 class="font-medium text-sm sm:text-base mb-2">节点关系</h3>
       <div 
         v-for="link in getLinksForNode(selectedNode.id)" 
         :key="link.id"
         class="flex justify-between items-center py-1 border-b border-gray-100"
       >
-        <div class="text-sm">
+        <div class="text-xs sm:text-sm">
           <span>{{ getNodeNameById(link.source === selectedNode.id ? link.target : link.source) }}</span>
-          <span class="mx-2 text-gray-400">-</span>
+          <span class="mx-1 sm:mx-2 text-gray-400">-</span>
           <span class="text-gray-600">{{ getLinkTypeName(link.type) }}</span>
         </div>
         <button 
@@ -72,7 +72,7 @@
           <i class="fas fa-edit"></i> 编辑
         </button>
       </div>
-      <div v-if="getLinksForNode(selectedNode.id).length === 0" class="text-sm text-gray-500">
+      <div v-if="getLinksForNode(selectedNode.id).length === 0" class="text-xs sm:text-sm text-gray-500">
         暂无关系
       </div>
     </div>

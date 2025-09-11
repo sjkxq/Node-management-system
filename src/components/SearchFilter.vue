@@ -1,29 +1,29 @@
 <template>
-  <div class="search-filter p-4 bg-white border-b border-gray-200">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+  <div class="search-filter p-2 sm:p-4 bg-white border-b border-gray-200">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
       <!-- 搜索框 -->
-      <div class="lg:col-span-2">
-        <label class="block text-sm font-medium text-gray-700 mb-1">搜索</label>
+      <div class="sm:col-span-2 md:col-span-3 lg:col-span-2">
+        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">搜索</label>
         <div class="relative">
           <input
             v-model="localSearchQuery"
             type="text"
             placeholder="搜索节点名称、描述、职位或联系方式..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full pl-7 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             @input="handleSearch"
           />
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="fas fa-search text-gray-400"></i>
+          <div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-search text-gray-400 text-xs sm:text-sm"></i>
           </div>
         </div>
       </div>
       
       <!-- 节点类型过滤 -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">节点类型</label>
+        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">节点类型</label>
         <select
           v-model="localSelectedNodeType"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           @change="handleNodeTypeChange"
         >
           <option value="">所有类型</option>
@@ -39,10 +39,10 @@
       
       <!-- 关系类型过滤 -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">关系类型</label>
+        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">关系类型</label>
         <select
           v-model="localSelectedLinkType"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           @change="handleLinkTypeChange"
         >
           <option value="">所有类型</option>
@@ -58,10 +58,10 @@
       
       <!-- 标签过滤 -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">标签</label>
+        <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">标签</label>
         <select
           v-model="localSelectedTag"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           @change="handleTagChange"
         >
           <option value="">所有标签</option>
@@ -77,64 +77,64 @@
     </div>
     
     <!-- 活动过滤器显示 -->
-    <div v-if="hasActiveFilters" class="mt-4 flex flex-wrap items-center gap-2">
-      <span class="text-sm text-gray-600">活动过滤器:</span>
+    <div v-if="hasActiveFilters" class="mt-2 sm:mt-4 flex flex-wrap items-center gap-1 sm:gap-2">
+      <span class="text-xs sm:text-sm text-gray-600">活动过滤器:</span>
       
       <span 
         v-if="searchQuery" 
-        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+        class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
       >
         搜索: "{{ searchQuery }}"
         <button 
           @click="clearSearch" 
-          class="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:outline-none"
+          class="ml-1 flex-shrink-0 h-3 w-3 sm:h-4 sm:w-4 rounded-full inline-flex items-center justify-center text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:outline-none"
         >
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times text-xs"></i>
         </button>
       </span>
       
       <span 
         v-if="selectedNodeType" 
-        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+        class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
       >
         节点类型: {{ getNodeTypeName(selectedNodeType) }}
         <button 
           @click="clearNodeType" 
-          class="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-green-400 hover:bg-green-200 hover:text-green-500 focus:outline-none"
+          class="ml-1 flex-shrink-0 h-3 w-3 sm:h-4 sm:w-4 rounded-full inline-flex items-center justify-center text-green-400 hover:bg-green-200 hover:text-green-500 focus:outline-none"
         >
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times text-xs"></i>
         </button>
       </span>
       
       <span 
         v-if="selectedLinkType" 
-        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+        class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
       >
         关系类型: {{ getLinkTypeName(selectedLinkType) }}
         <button 
           @click="clearLinkType" 
-          class="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-purple-400 hover:bg-purple-200 hover:text-purple-500 focus:outline-none"
+          class="ml-1 flex-shrink-0 h-3 w-3 sm:h-4 sm:w-4 rounded-full inline-flex items-center justify-center text-purple-400 hover:bg-purple-200 hover:text-purple-500 focus:outline-none"
         >
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times text-xs"></i>
         </button>
       </span>
       
       <span 
         v-if="selectedTag" 
-        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+        class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
       >
         标签: {{ getTagName(selectedTag) }}
         <button 
           @click="clearTag" 
-          class="ml-1 flex-shrink-0 h-4 w-4 rounded-full inline-flex items-center justify-center text-yellow-400 hover:bg-yellow-200 hover:text-yellow-500 focus:outline-none"
+          class="ml-1 flex-shrink-0 h-3 w-3 sm:h-4 sm:w-4 rounded-full inline-flex items-center justify-center text-yellow-400 hover:bg-yellow-200 hover:text-yellow-500 focus:outline-none"
         >
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times text-xs"></i>
         </button>
       </span>
       
       <button 
         @click="clearAllFilters" 
-        class="text-sm text-red-600 hover:text-red-800 font-medium"
+        class="text-xs sm:text-sm text-red-600 hover:text-red-800 font-medium"
       >
         清除所有过滤器
       </button>

@@ -12,8 +12,15 @@ html, body, #app {
 
 /* 滚动条样式 */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
+}
+
+@media (min-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 }
 
 ::-webkit-scrollbar-track {
@@ -37,4 +44,33 @@ button {
 /* SVG图形样式 */
 circle:hover {
   filter: brightness(1.1);
+}
+
+/* 响应式优化 */
+@media (max-width: 767px) {
+  /* 移动设备上的模态框适配 */
+  .modal-container {
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+  }
+  
+  .modal-content {
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+@media (max-width: 639px) {
+  /* 超小屏幕上的额外优化 */
+  .compact-form .form-field {
+    margin-bottom: 0.75rem;
+  }
+  
+  .compact-form .form-label {
+    font-size: 0.875rem;
+  }
+  
+  .compact-form .form-input {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
 }
