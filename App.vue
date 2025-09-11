@@ -7,7 +7,7 @@
           <button 
             @click="toggleTheme"
             class="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+            v-if="!showSettings && !showHierarchyManager"
           >
             <i :class="[
               'fas',
@@ -18,18 +18,18 @@
           </button>
           
           <button 
-            @click="openHighlightSettings"
+            @click="openSettings"
             class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+            v-if="!showSettings && !showHierarchyManager"
           >
-            <i class="fas fa-palette mr-1 sm:mr-2 text-xs sm:text-base"></i>
-            <span>高亮设置</span>
+            <i class="fas fa-cog mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>系统设置</span>
           </button>
           
           <button 
             @click="openNodeModal" 
             class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+            v-if="!showSettings && !showHierarchyManager"
           >
             <i class="fas fa-plus mr-1 sm:mr-2 text-xs sm:text-base"></i>
             <span>添加节点</span>
@@ -37,7 +37,7 @@
           <button 
             @click="openLinkModal"
             class="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+            v-if="!showSettings && !showHierarchyManager"
           >
             <i class="fas fa-link mr-1 sm:mr-2 text-xs sm:text-base"></i>
             <span>添加关系</span>
@@ -45,14 +45,14 @@
           <button 
             @click="exportData"
             class="bg-cyan-500 hover:bg-cyan-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+            v-if="!showSettings && !showHierarchyManager"
           >
             <i class="fas fa-file-export mr-1 sm:mr-2 text-xs sm:text-base"></i>
             <span>导出数据</span>
           </button>
           <label 
             class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center cursor-pointer text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+            v-if="!showSettings && !showHierarchyManager"
           >
             <i class="fas fa-file-import mr-1 sm:mr-2 text-xs sm:text-base"></i>
             <span>导入数据</span>
@@ -64,25 +64,9 @@
             />
           </label>
           <button 
-            @click="openTypeManager"
-            class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
-          >
-            <i class="fas fa-cog mr-1 sm:mr-2 text-xs sm:text-base"></i>
-            <span>类型管理</span>
-          </button>
-          <button 
-            @click="openTagManager"
-            class="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
-          >
-            <i class="fas fa-tags mr-1 sm:mr-2 text-xs sm:text-base"></i>
-            <span>标签管理</span>
-          </button>
-          <button 
             @click="openHierarchyManager"
             class="bg-teal-500 hover:bg-teal-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
-            v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+            v-if="!showSettings && !showHierarchyManager"
           >
             <i class="fas fa-sitemap mr-1 sm:mr-2 text-xs sm:text-base"></i>
             <span>层次结构</span>
@@ -93,7 +77,7 @@
 
     <div class="flex flex-1 overflow-hidden">
       <!-- 侧边栏 -->
-      <aside class="hidden md:block w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings">
+      <aside class="hidden md:block w-64 bg-gray-100 border-r border-gray-300 flex flex-col" v-if="!showSettings && !showHierarchyManager">
         <div class="p-3 sm:p-4 border-b border-gray-300">
           <h2 class="text-base sm:text-lg font-semibold mb-2">节点列表</h2>
           <NodeList @node-selected="handleNodeSelected" />
@@ -122,7 +106,7 @@
       <main class="flex-1 flex flex-col">
         <!-- 搜索和过滤组件 -->
         <SearchFilter 
-          v-if="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+          v-if="!showSettings && !showHierarchyManager"
           @filter-change="handleFilterChange"
         />
         
@@ -131,24 +115,14 @@
           class="flex-1" 
           @node-selected="handleNodeSelected"
           @link-selected="handleLinkSelected"
-          v-show="!showTypeManager && !showTagManager && !showHierarchyManager && !showHighlightSettings"
+          v-show="!showSettings && !showHierarchyManager"
         />
         
-        <!-- 类型管理界面 -->
-        <TypeManager v-if="showTypeManager" class="flex-1 overflow-auto" />
-        
-        <!-- 标签管理界面 -->
-        <TagManager v-if="showTagManager" class="flex-1 overflow-auto" />
+        <!-- 系统设置界面 -->
+        <Settings v-if="showSettings" class="flex-1 overflow-auto" />
         
         <!-- 层次结构管理界面 -->
         <HierarchyManager v-if="showHierarchyManager" class="flex-1 overflow-auto" />
-        
-        <!-- 高亮颜色设置界面 -->
-        <HighlightSettings 
-          v-if="showHighlightSettings" 
-          class="flex-1 overflow-auto" 
-          @exit="closeHighlightSettings"
-        />
       </main>
     </div>
 
@@ -166,11 +140,9 @@ import NetworkGraph from './src/components/NetworkGraph.vue'
 import NodeList from './src/components/NodeList.vue'
 import NodeModal from './src/components/NodeModal.vue'
 import LinkModal from './src/components/LinkModal.vue'
-import TypeManager from './src/components/TypeManager.vue'
-import TagManager from './src/components/TagManager.vue'
+import Settings from './src/components/Settings.vue'
 import HierarchyManager from './src/components/HierarchyManager.vue'
 import SearchFilter from './src/components/SearchFilter.vue'
-import HighlightSettings from './src/components/HighlightSettings.vue'
 import { useNodeStore } from './src/stores/nodes'
 import { useThemeStore } from './src/stores/theme'
 
@@ -181,21 +153,17 @@ export default {
     NodeList,
     NodeModal,
     LinkModal,
-    TypeManager,
-    TagManager,
+    Settings,
     HierarchyManager,
-    SearchFilter,
-    HighlightSettings
+    SearchFilter
   },
   setup() {
     const networkGraph = ref(null)
     const nodeStore = useNodeStore()
     const isFullScreen = ref(false)
     const selectedNode = ref(null)
-    const showTypeManager = ref(false)
-    const showTagManager = ref(false)
+    const showSettings = ref(false)
     const showHierarchyManager = ref(false)
-    const showHighlightSettings = ref(false)
 
     const openNodeModal = () => {
       nodeStore.openNodeModal()
@@ -244,20 +212,12 @@ export default {
       }
     }
     
-    const openTypeManager = () => {
-      showTypeManager.value = true
+    const openSettings = () => {
+      showSettings.value = true
     }
     
-    const closeTypeManager = () => {
-      showTypeManager.value = false
-    }
-    
-    const openTagManager = () => {
-      showTagManager.value = true
-    }
-    
-    const closeTagManager = () => {
-      showTagManager.value = false
+    const closeSettings = () => {
+      showSettings.value = false
     }
     
     const openHierarchyManager = () => {
@@ -269,8 +229,7 @@ export default {
     }
     
     // 提供关闭各种管理界面的方法给子组件
-    provide('closeTypeManager', closeTypeManager)
-    provide('closeTagManager', closeTagManager)
+    provide('closeTypeManager', closeSettings)
     provide('closeHierarchyManager', closeHierarchyManager)
 
     const exportData = () => {
@@ -316,21 +275,11 @@ export default {
       reader.readAsText(file)
     }
 
-    const openHighlightSettings = () => {
-      showHighlightSettings.value = true
-    }
-    
-    const closeHighlightSettings = () => {
-      showHighlightSettings.value = false
-    }
-
     return {
       networkGraph,
       isFullScreen,
-      showTypeManager,
-      showTagManager,
+      showSettings,
       showHierarchyManager,
-      showHighlightSettings,
       selectedNode,
       openNodeModal,
       openLinkModal,
@@ -339,16 +288,12 @@ export default {
       handleNodeSelected,
       handleLinkSelected,
       handleFilterChange,
-      openTypeManager,
-      closeTypeManager,
-      openTagManager,
-      closeTagManager,
+      openSettings,
+      closeSettings,
       openHierarchyManager,
       closeHierarchyManager,
       exportData,
-      importData,
-      openHighlightSettings,
-      closeHighlightSettings
+      importData
     }
   }
 }
