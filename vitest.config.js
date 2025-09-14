@@ -17,7 +17,7 @@ export default defineConfig({
     // 启用覆盖率
     coverage: {
       reporter: ['text', 'json', 'html'],
-      include: ['src/**/*.{js,ts,vue}'],
+      include: ['src/**/*.{js,ts,vue}', 'tests/**/*.{js,ts,vue}'],
       exclude: [
         'src/main.js',
         '**/node_modules/**',

@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { useNodeStore } from './nodes'
+import { useNodeStore } from '../../src/stores/nodes'
 import { beforeEach, describe, it, expect } from 'vitest'
 
 describe('Node Store', () => {
