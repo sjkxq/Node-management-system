@@ -6,6 +6,26 @@
 
 节点管理系统采用前后端分离的架构设计，前端基于Vue 3框架构建，使用组件化开发模式。系统通过Pinia进行全局状态管理，通过vis-network库实现网络可视化功能。
 
+系统架构图：
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    浏览器/WebView环境                        │
+├─────────────────────────────────────────────────────────────┤
+│                      Vue 3 组件层                            │
+│  App.vue  NetworkGraph.vue  NodeList.vue  Settings.vue ...  │
+├─────────────────────────────────────────────────────────────┤
+│                     状态管理层 (Pinia)                       │
+│    nodes.js      types.js      theme.js      highlight.js    │
+├─────────────────────────────────────────────────────────────┤
+│                     可视化引擎层                              │
+│                         vis-network                          │
+├─────────────────────────────────────────────────────────────┤
+│                     构建与部署层                              │
+│            Vite + vite-plugin-singlefile                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### 组件结构
 
 系统采用分层组件结构：
@@ -24,6 +44,14 @@
 3. 状态变化触发视图更新
 4. 视图更新反馈给用户
 
+数据流图：
+
+```
+用户操作 → Vue组件 → Pinia状态 → vis-network → 视图更新
+               ↑                                     │
+               └───────────── 数据持久化 ──────────────┘
+```
+
 ## 核心技术实现
 
 ### 1. 网络可视化实现
@@ -32,8 +60,7 @@
 
 ```javascript
 // NetworkGraph.vue中的核心实现
-import { DataSet } from 'vis-data/peer'
-import { Network } from 'vis-network'
+import { DataSet, Network } from 'vis-network/standalone/esm/vis-network.min.js'
 
 // 创建节点和链接数据集
 const nodes = new DataSet([])
@@ -48,6 +75,14 @@ const network = new Network(container, { nodes, edges }, options)
 - 支持缩放和导航
 - 支持事件处理
 - 支持自定义样式
+- 支持物理布局模拟
+- 支持集群和分组功能
+
+**实现细节**：
+- 使用独立版本的vis-network以减少打包体积
+- 实现了自定义节点渲染
+- 集成了高亮显示功能
+- 实现了节点选择和聚焦功能
 
 ### 2. 状态管理实现
 
@@ -56,18 +91,22 @@ const network = new Network(container, { nodes, edges }, options)
 ```javascript
 // stores/nodes.js 示例
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
-export const useNodeStore = defineStore('nodes', {
-  state: () => ({
-    nodes: [],
-    links: [],
-    isNodeModalOpen: false
-  }),
+export const useNodeStore = defineStore('nodes', () => {
+  const nodes = ref([])
+  const links = ref([])
+  const isNodeModalOpen = ref(false)
   
-  actions: {
-    addNode(node) {
-      this.nodes.push(node)
-    }
+  const addNode = (node) => {
+    nodes.value.push(node)
+  }
+  
+  return {
+    nodes,
+    links,
+    isNodeModalOpen,
+    addNode
   }
 })
 ```
@@ -77,6 +116,7 @@ export const useNodeStore = defineStore('nodes', {
 - 模块化存储设计
 - 支持异步操作
 - 易于测试和维护
+- 使用Vue 3 Composition API
 
 ### 3. 组件通信实现
 
@@ -101,16 +141,17 @@ const closeTypeManager = inject('closeTypeManager')
 
 ```javascript
 // theme.js中的主题切换实现
-export const useThemeStore = defineStore('theme', {
-  state: () => ({
-    currentTheme: 'light'
-  }),
+export const useThemeStore = defineStore('theme', () => {
+  const currentTheme = ref('light')
   
-  actions: {
-    toggleTheme() {
-      this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light'
-      document.documentElement.setAttribute('data-theme', this.currentTheme)
-    }
+  const toggleTheme = () => {
+    currentTheme.value = currentTheme.value === 'light' ? 'dark' : 'light'
+    document.documentElement.setAttribute('data-theme', currentTheme.value)
+  }
+  
+  return {
+    currentTheme,
+    toggleTheme
   }
 })
 ```
@@ -122,7 +163,7 @@ export const useThemeStore = defineStore('theme', {
 ```javascript
 {
   id: String,           // 节点唯一标识
-  label: String,        // 节点标签
+  name: String,         // 节点名称
   type: String,         // 节点类型
   tags: Array,          // 节点标签数组
   properties: Object,   // 节点属性
@@ -136,8 +177,8 @@ export const useThemeStore = defineStore('theme', {
 ```javascript
 {
   id: String,           // 链接唯一标识
-  from: String,         // 起始节点ID
-  to: String,           // 目标节点ID
+  source: String,       // 起始节点ID
+  target: String,       // 目标节点ID
   type: String,         // 链接类型
   label: String,        // 链接标签
   properties: Object    // 链接属性
@@ -164,6 +205,16 @@ export const useThemeStore = defineStore('theme', {
 }
 ```
 
+### 标签数据结构
+
+```javascript
+{
+  id: String,           // 标签ID
+  name: String,         // 标签名称
+  color: String         // 标签颜色
+}
+```
+
 ## 样式和UI实现
 
 ### Tailwind CSS使用
@@ -186,6 +237,24 @@ export const useThemeStore = defineStore('theme', {
 <aside class="hidden md:block w-64 bg-gray-100 border-r border-gray-300 flex flex-col">
 ```
 
+### CSS变量和主题
+
+使用CSS变量实现主题切换：
+
+```css
+/* 日间模式 */
+[data-theme="light"] {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+}
+
+/* 夜间模式 */
+[data-theme="dark"] {
+  --bg-color: #1a202c;
+  --text-color: #e2e8f0;
+}
+```
+
 ## 性能优化策略
 
 ### 1. 网络图性能优化
@@ -193,18 +262,28 @@ export const useThemeStore = defineStore('theme', {
 - 使用vis-network的集群功能处理大量节点
 - 实现虚拟化渲染，只渲染可见区域的节点
 - 对节点和链接数据进行分页加载
+- 使用requestAnimationFrame优化渲染性能
 
 ### 2. 状态管理优化
 
 - 合理划分存储模块，避免单个存储过大
 - 使用计算属性减少重复计算
 - 实现数据缓存机制
+- 使用watch监听关键数据变化
 
 ### 3. 组件性能优化
 
 - 使用Vue的keep-alive缓存组件
 - 实现组件懒加载
 - 避免不必要的重新渲染
+- 使用v-show和v-if合理控制组件显示
+
+### 4. 打包优化
+
+- 使用vite-plugin-singlefile实现单文件部署
+- 代码分割和懒加载
+- Tree shaking减少打包体积
+- 压缩和混淆代码
 
 ## 安全性考虑
 
@@ -213,9 +292,64 @@ export const useThemeStore = defineStore('theme', {
 - 对用户输入进行严格的验证和过滤
 - 使用Vue的模板语法自动转义HTML内容
 - 避免直接使用innerHTML
+- 使用安全的DOM操作方法
 
 ### 2. 数据安全
 
 - 在数据存储和传输过程中进行适当的加密
 - 实现数据备份和恢复机制
 - 防止数据丢失和损坏
+- 使用JSON安全解析和序列化
+
+### 3. 依赖安全
+
+- 定期更新第三方依赖
+- 使用安全的依赖版本
+- 避免使用不安全的依赖
+- 审查第三方代码
+
+## 测试策略
+
+### 1. 单元测试
+
+- 使用Vitest进行单元测试
+- 对Pinia存储进行测试
+- 对Vue组件进行测试
+- 实现测试覆盖率监控
+
+### 2. 组件测试
+
+- 使用Vue Test Utils测试组件
+- 测试组件的渲染和交互
+- 测试组件的props和events
+- 测试组件的状态管理
+
+### 3. 集成测试
+
+- 测试组件间的集成
+- 测试数据流和状态变化
+- 测试用户操作流程
+- 测试边界条件和异常情况
+
+## 部署和构建
+
+### 1. 构建配置
+
+- 使用Vite进行构建
+- 支持开发和生产环境
+- 支持单文件部署
+- 支持静态文件部署
+
+### 2. 部署方式
+
+- 静态文件部署到Web服务器
+- 单文件部署（HTML文件）
+- 通过Electron打包为桌面应用
+- 部署到CDN或云存储
+
+### 3. 环境配置
+
+- 开发环境配置
+- 测试环境配置
+- 生产环境配置
+- 环境变量管理
