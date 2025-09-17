@@ -77,12 +77,14 @@ const network = new Network(container, { nodes, edges }, options)
 - 支持自定义样式
 - 支持物理布局模拟
 - 支持集群和分组功能
+- 支持导出为图片
 
 **实现细节**：
 - 使用独立版本的vis-network以减少打包体积
 - 实现了自定义节点渲染
 - 集成了高亮显示功能
 - 实现了节点选择和聚焦功能
+- 使用vis-network的afterDrawing事件正确导出图片
 
 ### 2. 状态管理实现
 
@@ -155,6 +157,35 @@ export const useThemeStore = defineStore('theme', () => {
   }
 })
 ```
+
+### 5. 图片导出实现
+
+使用vis-network的afterDrawing事件实现图片导出功能：
+
+```javascript
+// NetworkGraph.vue中的图片导出实现
+const exportToImage = () => {
+  if (!network) return
+  
+  // 使用vis-network的内置方法导出图片
+  network.once("afterDrawing", (canvasContext) => {
+    const canvas = canvasContext.canvas;
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "network-graph.png";
+    link.click();
+  });
+  
+  // 触发重绘以确保afterDrawing事件被触发
+  network.redraw();
+}
+```
+
+**关键特性**：
+- 使用vis-network的afterDrawing事件正确获取canvas内容
+- 支持PNG格式导出
+- 自动触发浏览器下载
+- 不会干扰网络图的正常显示
 
 ## 数据结构设计
 
