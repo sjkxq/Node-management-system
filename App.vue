@@ -36,6 +36,15 @@
           </button>
           
           <button 
+            @click="exportToImage"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
+            v-if="!showSettings && !showHierarchyManager && !showDataManagement"
+          >
+            <i class="fas fa-camera mr-1 sm:mr-2 text-xs sm:text-base"></i>
+            <span>导出图片</span>
+          </button>
+          
+          <button 
             @click="openNodeModal" 
             class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-md flex items-center text-sm sm:text-base"
             v-if="!showSettings && !showHierarchyManager && !showDataManagement"
@@ -230,6 +239,13 @@ export default {
       showHierarchyManager.value = false
     }
     
+    // 导出图片功能
+    const exportToImage = () => {
+      if (networkGraph.value) {
+        networkGraph.value.exportToImage()
+      }
+    }
+    
     // 提供关闭各种管理界面的方法给子组件
     provide('closeTypeManager', closeSettings)
     provide('closeDataManagement', closeDataManagement)
@@ -254,7 +270,8 @@ export default {
       openDataManagement,
       closeDataManagement,
       openHierarchyManager,
-      closeHierarchyManager
+      closeHierarchyManager,
+      exportToImage
     }
   }
 }

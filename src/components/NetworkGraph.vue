@@ -26,6 +26,13 @@
         >
           <i class="fas fa-expand"></i>
         </button>
+        <button 
+          @click="exportToImage" 
+          class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center justify-center text-xs sm:text-base"
+          title="导出为图片"
+        >
+          <i class="fas fa-camera"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -436,6 +443,23 @@ export default {
       })
     }
     
+    // 导出为图片
+    const exportToImage = () => {
+      if (!network) return
+      
+      // 使用vis-network的内置方法导出图片
+      network.once("afterDrawing", (canvasContext) => {
+        const canvas = canvasContext.canvas;
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = "network-graph.png";
+        link.click();
+      });
+      
+      // 触发重绘以确保afterDrawing事件被触发
+      network.redraw();
+    }
+    
     // 组件挂载时初始化
     onMounted(() => {
       nextTick(() => {
@@ -459,7 +483,8 @@ export default {
       resetView,
       highlightNode,
       resetHighlight,
-      editLink
+      editLink,
+      exportToImage
     }
   }
 }
