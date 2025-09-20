@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="flex flex-col h-screen">
+    <ElectronFeatures />
     <header class="bg-blue-600 text-white p-2 sm:p-4 shadow-md">
       <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
         <h1 class="text-xl sm:text-2xl font-bold">节点管理系统</h1>
@@ -157,7 +158,8 @@ export default {
     Settings,
     DataManagement,
     HierarchyManager,
-    SearchFilter
+    SearchFilter,
+    ElectronFeatures: () => import('./src/components/ElectronFeatures.vue')
   },
   setup() {
     const networkGraph = ref(null)

@@ -1,3 +1,27 @@
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import './src/index.css'
+import { useThemeStore } from './src/stores/theme'
+import { useHighlightStore } from './src/stores/highlight'
+
+// 创建应用实例
+const app = createApp(App)
+
+// 使用Pinia状态管理
+const pinia = createPinia()
+app.use(pinia)
+
+// 初始化主题
+const themeStore = useThemeStore()
+themeStore.initTheme()
+
+// 初始化高亮颜色
+const highlightStore = useHighlightStore()
+highlightStore.initHighlightColors()
+
+// 挂载应用
+app.mount('#app')
 // 类型存储模块
 export default {
   // 类型存储的初始状态
